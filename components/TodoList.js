@@ -32,7 +32,7 @@ export default function TodoList() {
         variables: { id: id.toString(), completed: !completed },
         update: (cache, { data: { update_tasks_by_pk } }) => {
           const existingTasks = cache.readQuery({ query: GET_TASKS });
-  
+
           cache.writeQuery({
             query: GET_TASKS,
             data: {
@@ -43,14 +43,14 @@ export default function TodoList() {
           });
         },
       });
-  
+
       refetch(); // Ensure UI updates
     } catch (error) {
       console.error("Error updating task:", error);
     }
   };
-  
-  
+
+
 
   // 🔹 Delete Task
   const handleDeleteTask = async (id) => {
@@ -61,7 +61,7 @@ export default function TodoList() {
       console.error("Error deleting task:", error);
     }
   };
-  
+
 
   // 🔹 Enable Edit Mode
   const handleEdit = (task) => {
@@ -80,67 +80,76 @@ export default function TodoList() {
       console.error("Error updating task:", error);
     }
   };
-  
+
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error loading tasks</p>;
 
   return (
-    <div className="max-w-lg mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg">
-      <h1 className="text-xl font-bold mb-4">To-Do List</h1>
+    <div className=" min-h-screen mt-10 flex-col items-center justify-center p-10 shadow-lg">
+      <h1 className="text-4xl font-bold mb-4">Welcome to your To-Do List</h1>
+      <div className="max-w-sm mx-auto  p-5 bg-white ">
 
-      {/* Add Task Input */}
-      <div className="flex gap-2">
-        <input
-          type="text"
-          className="border p-2 w-full"
-          placeholder="Add a task..."
-          value={taskInput}
-          onChange={(e) => setTaskInput(e.target.value)}
-        />
-        <button onClick={handleAddTask} className="bg-blue-500 text-white px-4 py-2">Add</button>
+
+        {/* Add Task Input */}
+        <div className="flex gap-2">
+          <input
+            type="text"
+            className="border p-2 w-full rounded-lg"
+            placeholder="Add a task..."
+            value={taskInput}
+            onChange={(e) => setTaskInput(e.target.value)}
+          />
+          <button onClick={handleAddTask} className="bg-blue-500 text-white rounded-lg px-4 py-2">Add</button>
+        </div>
+
+        {/* Task List */}
+        <div className="max-w-full mx-auto mt-10 shadow-lg bg-white  rounded-lg">
+          <h3 className="text-sm font-bold mb-4 p-2 bg-blue-400 shadow-lg rounded-lg ">Add | Update | Delete</h3>
+          <ul className="mt-4">
+            {data.tasks.map((task) => (
+              <li key={task.id} className="flex justify-between items-center  p-2 mt-2 rounded">
+                
+                
+                {/* Buttons */}
+                <div className="flex gap-2">
+                  {/* Complete Checkbox */}
+                  {editingTask === task.id ? (
+                  <input
+                    type="text"
+                    value={editedTitle}
+                    onChange={(e) => setEditedTitle(e.target.value)}
+                    className="border p-1"
+                  />
+                ) : (
+                  <span className={task.completed ? "line-through text-gray-500 bg-blue-200 p-2" : ""}>
+                    {task.title}
+                  </span>
+                )}
+                  <input
+                    type="checkbox"
+                    checked={task.completed}
+                    onChange={() => handleToggleComplete(task.id, task.completed)}
+                  />
+                  
+                
+
+
+                  {/* Edit & Save Buttons */}
+                  {editingTask === task.id ? (
+                    <button onClick={() => handleSaveEdit(task.id)} ><img src="../pencil.png" /></button>
+                  ) : (
+                    <button onClick={() => handleEdit(task)} ><img src="../pencil.png" /></button>
+                  )}
+
+                  {/* Delete Button */}
+                  <button onClick={() => handleDeleteTask(task.id)}><img src="../delete.png" /></button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-
-      {/* Task List */}
-      <ul className="mt-4">
-        {data.tasks.map((task) => (
-          <li key={task.id} className="flex justify-between items-center bg-gray-100 p-2 mt-2 rounded">
-            {/* Task Title (Editable) */}
-            {editingTask === task.id ? (
-              <input
-                type="text"
-                value={editedTitle}
-                onChange={(e) => setEditedTitle(e.target.value)}
-                className="border p-1"
-              />
-            ) : (
-              <span className={task.completed ? "line-through text-gray-500" : ""}>
-                {task.title}
-              </span>
-            )}
-
-            {/* Buttons */}
-            <div className="flex gap-2">
-              {/* Complete Checkbox */}
-              <input
-                type="checkbox"
-                checked={task.completed}
-                onChange={() => handleToggleComplete(task.id, task.completed)}
-              />
-
-              {/* Edit & Save Buttons */}
-              {editingTask === task.id ? (
-                <button onClick={() => handleSaveEdit(task.id)} className="text-green-500">✔️</button>
-              ) : (
-                <button onClick={() => handleEdit(task)} className="text-yellow-500">✏️</button>
-              )}
-
-              {/* Delete Button */}
-              <button onClick={() => handleDeleteTask(task.id)} className="text-red-500">🗑️</button>
-            </div>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
